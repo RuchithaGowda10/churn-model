@@ -97,13 +97,23 @@ if st.button("Predict Churn"):
         response = requests.post(ml_endpoint, headers=headers, json=input_payload)
         result = response.json()
 
+        # DEBUG: Show raw result in the app
+        st.markdown("#### 🧾 Raw Model Response")
+        st.code(result)
+
+        # Parse prediction result
+        prediction = None
         if isinstance(result, list):
             prediction = result[0]
-        elif isinstance(result, dict) and 'result' in result:
-            prediction = result["result"][0]
-        else:
-            prediction = None
+        elif isinstance(result, dict):
+            if "result" in result:
+                prediction = result["result"][0]
+            elif "predictions" in result:
+                prediction = result["predictions"][0]
+            elif "output" in result:
+                prediction = result["output"][0]
 
+        # Output
         if prediction == 1:
             st.error("⚠️ This customer is likely to churn.")
         elif prediction == 0:
@@ -111,6 +121,7 @@ if st.button("Predict Churn"):
         else:
             st.warning("⚠️ Unable to determine prediction result.")
 
+        # GPT Explanation
         with st.spinner("🧠 Explaining the prediction..."):
             explanation = get_explanation(credit_score, age, balance, products, credit_card, active, salary)
             st.markdown("### 💡 GPT-4 Explanation")
