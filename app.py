@@ -1,17 +1,13 @@
 import streamlit as st
+st.set_page_config(page_title="🔍 Customer Churn Predictor", layout="centered")
+
 import requests
 import openai
 import os
 from dotenv import load_dotenv
 
-# ✅ MUST be the first Streamlit command
-st.set_page_config(page_title="🔍 Customer Churn Predictor", layout="centered")
-
-# 🌍 Load environment variables
+# Load environment variables
 load_dotenv()
-
-# Optional: debug line (you can remove this after testing)
-# st.warning(f"ML_ENDPOINT: {os.getenv('AZURE_ML_ENDPOINT')}")
 
 # UI
 st.title("🔍 Customer Churn Prediction App")
@@ -35,12 +31,17 @@ salary = st.number_input("Estimated Salary", 0.0, 200000.0, 55000.0)
 ml_endpoint = os.getenv("AZURE_ML_ENDPOINT")
 ml_token = os.getenv("AZURE_ML_TOKEN")
 
+# Fallback if env vars are not set
+if not ml_endpoint or not ml_token:
+    st.error("❌ Azure ML endpoint or token not set. Check App Service configuration.")
+    st.stop()
+
+# OpenAI GPT Setup
 openai.api_type = "azure"
 openai.api_base = os.getenv("AZURE_OPENAI_BASE")
 openai.api_version = "2025-01-01-preview"
 openai.api_key = os.getenv("AZURE_OPENAI_KEY")
 
-# GPT-4 Explanation
 def get_explanation(credit_score, age, balance, products, credit_card, active, salary):
     prompt = f"""
 The following customer was evaluated for churn risk. Provide a detailed explanation of each parameter and how it may contribute to churn.
@@ -67,7 +68,7 @@ Explain clearly in plain business terms for a non-technical audience.
         )
         return response['choices'][0]['message']['content']
     except Exception as e:
-        return f"⚠️ GPT error: {str(e)}"
+        return f"⚠️ GPT error: {str(e)}\n\nIf you're using OpenAI>=1.0.0, consider downgrading to `openai==0.28` or updating API calls."
 
 # Prediction logic
 if st.button("Predict Churn"):
