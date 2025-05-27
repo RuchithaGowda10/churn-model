@@ -6,8 +6,7 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env (for local dev)
 load_dotenv()
-print("✅ Loaded AZURE_ML_ENDPOINT:", os.getenv("AZURE_ML_ENDPOINT"))
-
+st.warning(f"ML_ENDPOINT: {os.getenv('AZURE_ML_ENDPOINT')}")
 
 # Streamlit UI setup
 st.set_page_config(page_title="🔍 Customer Churn Predictor", layout="centered")
