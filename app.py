@@ -4,12 +4,16 @@ import openai
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env (for local dev)
-load_dotenv()
-st.warning(f"ML_ENDPOINT: {os.getenv('AZURE_ML_ENDPOINT')}")
-
-# Streamlit UI setup
+# ✅ MUST be the first Streamlit command
 st.set_page_config(page_title="🔍 Customer Churn Predictor", layout="centered")
+
+# 🌍 Load environment variables
+load_dotenv()
+
+# Optional: debug line (you can remove this after testing)
+# st.warning(f"ML_ENDPOINT: {os.getenv('AZURE_ML_ENDPOINT')}")
+
+# UI
 st.title("🔍 Customer Churn Prediction App")
 st.write("Enter customer details below:")
 
@@ -36,7 +40,7 @@ openai.api_base = os.getenv("AZURE_OPENAI_BASE")
 openai.api_version = "2025-01-01-preview"
 openai.api_key = os.getenv("AZURE_OPENAI_KEY")
 
-# OpenAI GPT Explanation
+# GPT-4 Explanation
 def get_explanation(credit_score, age, balance, products, credit_card, active, salary):
     prompt = f"""
 The following customer was evaluated for churn risk. Provide a detailed explanation of each parameter and how it may contribute to churn.
@@ -65,7 +69,7 @@ Explain clearly in plain business terms for a non-technical audience.
     except Exception as e:
         return f"⚠️ GPT error: {str(e)}"
 
-# Submit
+# Prediction logic
 if st.button("Predict Churn"):
     st.info("🔄 Sending data to Azure ML model...")
 
@@ -99,7 +103,6 @@ if st.button("Predict Churn"):
         else:
             prediction = None
 
-        # Output
         if prediction == 1:
             st.error("⚠️ This customer is likely to churn.")
         elif prediction == 0:
@@ -114,9 +117,3 @@ if st.button("Predict Churn"):
 
     except Exception as e:
         st.error(f"❌ Azure ML error: {e}")
-
-import os
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    os.system(f"streamlit run app.py --server.address=0.0.0.0 --server.port={port}")
