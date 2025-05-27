@@ -113,3 +113,9 @@ if st.button("Predict Churn"):
 
     except Exception as e:
         st.error(f"❌ Azure ML error: {e}")
+        
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    os.system(f"streamlit run app.py --server.address=0.0.0.0 --server.port={port}")
