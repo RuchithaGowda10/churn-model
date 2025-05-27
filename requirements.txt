@@ -1,1 +1,7 @@
-pip freeze > requirements.txt
+streamlit==1.45.1
+openai==0.28.1
+pandas==2.2.3
+numpy==2.0.2
+requests==2.32.3
+python-dotenv==1.0.1
+scikit-learn==1.4.2
